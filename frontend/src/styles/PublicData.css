@@ -1,0 +1,156 @@
+.public-data-dashboard {
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .public-data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+  }
+  
+  .data-section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+  
+  .data-section h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.3em;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+  }
+  
+  /* Fuentes de Datos */
+  .sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .source-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+  
+  .source-name {
+    font-weight: 600;
+    flex: 2;
+  }
+  
+  .source-type, .source-reliability {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 500;
+  }
+  
+  .source-type.público { background: #e3f2fd; color: #1976d2; }
+  .source-type.interno { background: #f3e5f5; color: #7b1fa2; }
+  
+  .source-reliability.alta { background: #e8f5e8; color: #2e7d32; }
+  .source-reliability.media { background: #fff3e0; color: #ef6c00; }
+  .source-reliability.baja { background: #ffebee; color: #c62828; }
+  
+  /* Correlaciones */
+  .correlations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .correlation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+  }
+  
+  .correlation-factors {
+    font-weight: 500;
+  }
+  
+  .correlation-value {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  
+  .correlation-value.positive {
+    background: #e8f5e8;
+    color: #2e7d32;
+  }
+  
+  .correlation-value.negative {
+    background: #ffebee;
+    color: #c62828;
+  }
+  
+  /* Insights */
+  .insights-box {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #ffa000;
+  }
+  
+  .insights-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .insight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .insight-bullet {
+    font-size: 1.2em;
+    flex-shrink: 0;
+  }
+  
+  .insight-text {
+    line-height: 1.4;
+  }
+  
+  /* Secciones Especiales */
+  .comparison-section {
+    grid-column: 1 / -1;
+  }
+  
+  .insights-section {
+    grid-column: 1 / -1;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .public-data-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .source-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .source-name {
+      flex: none;
+    }
+  }
+  
