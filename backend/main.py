@@ -24,11 +24,8 @@ def analizar_correo_local(asunto, contenido):
             },
         ])
         
-        # Obtenemos el texto de la respuesta
         respuesta_texto = response['message']['content']
         
-        # Limpieza básica por si el modelo añade texto antes o después del JSON
-        # Intentamos encontrar dónde empieza '{' y termina '}'
         start = respuesta_texto.find('{')
         end = respuesta_texto.rfind('}') + 1
         if start != -1 and end != -1:
@@ -41,8 +38,6 @@ def analizar_correo_local(asunto, contenido):
         print(f"Error con Ollama: {e}")
         return {"sentimiento": "Error", "problemas": "Error", "calificacion": 0}
 
-# --- El resto es igual que el script anterior ---
-
 df = pd.read_csv('tu_archivo.csv')
 
 print("Analizando con Ollama local (Llama 3.1)...")
@@ -52,7 +47,6 @@ problemas = []
 calificaciones = []
 
 for index, row in df.iterrows():
-    # Feedback visual para saber que avanza
     print(f"Procesando correo {index + 1} de {len(df)}...") 
     
     resultado = analizar_correo_local(row['Asunto'], row['Contenido'])
