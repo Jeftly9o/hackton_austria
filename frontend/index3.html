@@ -1,11 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Encuesta Final</title>
 </head>
 <body>
+    <h1>Encuesta de Satisfacción</h1>
     
+    <form id="miEncuesta" style="background: #f4f4f4; padding: 20px;">
+        <label>Nombre:</label><br>
+        <input type="text" id="nombre" required><br><br>
+
+        <label>¿Te gusta programar?</label><br>
+        <select id="gusto">
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+        </select><br><br>
+
+        <button type="submit" style="padding: 10px 20px; font-size: 16px;">Enviar Respuesta</button>
+    </form>
+    
+    <div id="status" style="margin-top: 20px; color: red;"></div>
+
+    <script>
+        // Alerta 1: Verificar que el script cargó
+        console.log("Script cargado correctamente");
+
+        const form = document.getElementById('miEncuesta');
+
+        if (!form) {
+            alert("❌ ERROR GRAVE: No encuentro el formulario con id='miEncuesta'");
+        } else {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); 
+
+                // Alerta 2: Confirmar clic
+                alert("1. Botón presionado. Preparando datos...");
+
+                try {
+                    const nombreVal = document.getElementById('nombre').value;
+                    const gustoVal = document.getElementById('gusto').value;
+
+                    const data = {
+                        nombre: nombreVal,
+                        gusto: gustoVal,
+                        fecha: new Date().toISOString()
+                    };
+
+                    // Alerta 3: Datos listos
+                    alert("2. Datos listos: " + JSON.stringify(data) + ". Enviando al servidor...");
+
+                    fetch('/guardar-encuesta', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Error del servidor: ' + response.status);
+                        return response.text();
+                    })
+                    .then(texto => {
+                        alert("✅ 3. ¡ÉXITO TOTAL! El servidor respondió: " + texto);
+                        document.getElementById('miEncuesta').reset();
+                    })
+                    .catch(error => {
+                        alert("❌ 3. FALLÓ EL ENVÍO: " + error.message);
+                        document.getElementById('status').innerText = "Error: " + error.message;
+                    });
+
+                } catch (err) {
+                    alert("❌ Error interno en JS: " + err.message);
+                }
+            });
+        }
+    </script>
 </body>
 </html>
