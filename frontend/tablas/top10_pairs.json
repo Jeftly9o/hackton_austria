@@ -1,1 +1,62 @@
-[{"palabra_1":"tren","palabra_2":"cancelacion","count":211.0,"par":"tren + cancelacion"},{"palabra_1":"retraso","palabra_2":"causado","count":172.0,"par":"retraso + causado"},{"palabra_1":"tren","palabra_2":"retraso","count":172.0,"par":"tren + retraso"},{"palabra_1":"retraso","palabra_2":"habia","count":164.0,"par":"retraso + habia"},{"palabra_1":"retraso","palabra_2":"debido","count":158.0,"par":"retraso + debido"},{"palabra_1":"retraso","palabra_2":"minutos","count":155.0,"par":"retraso + minutos"},{"palabra_1":"aire","palabra_2":"acondicionado","count":146.0,"par":"aire + acondicionado"},{"palabra_1":"problemas","palabra_2":"billete","count":146.0,"par":"problemas + billete"},{"palabra_1":"personal","palabra_2":"falta","count":131.0,"par":"personal + falta"},{"palabra_1":"mejorar","palabra_2":"sugerencia","count":113.0,"par":"mejorar + sugerencia"}]
+[
+    {
+        "palabra_1":"comunicacion",
+        "palabra_2":"durante",
+        "count":42.0,
+        "par":"comunicacion + durante"
+    },
+    {
+        "palabra_1":"lo",
+        "palabra_2":"pasajeros",
+        "count":0.0,
+        "par":"lo + pasajeros"
+    },
+    {
+        "palabra_1":"situacion",
+        "palabra_2":"tren",
+        "count":0.0,
+        "par":"situacion + tren"
+    },
+    {
+        "palabra_1":"lo",
+        "palabra_2":"gustaria",
+        "count":0.0,
+        "par":"lo + gustaria"
+    },
+    {
+        "palabra_1":"lo",
+        "palabra_2":"bastante",
+        "count":0.0,
+        "par":"lo + bastante"
+    },
+    {
+        "palabra_1":"situacion",
+        "palabra_2":"durante",
+        "count":0.0,
+        "par":"situacion + durante"
+    },
+    {
+        "palabra_1":"situacion",
+        "palabra_2":"viaje",
+        "count":0.0,
+        "par":"situacion + viaje"
+    },
+    {
+        "palabra_1":"situacion",
+        "palabra_2":"inconveniente",
+        "count":0.0,
+        "par":"situacion + inconveniente"
+    },
+    {
+        "palabra_1":"problema",
+        "palabra_2":"algo",
+        "count":0.0,
+        "par":"problema + algo"
+    },
+    {
+        "palabra_1":"problema",
+        "palabra_2":"momento",
+        "count":0.0,
+        "par":"problema + momento"
+    }
+]
