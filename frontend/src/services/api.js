@@ -62,3 +62,78 @@ export const mockData = {
       return { data: mockData.wordcloud };
     }
   };
+
+  // src/services/api.js
+
+// Simulamos datos para desarrollo
+const mockIssuesData = {
+    "Operador A": 45,
+    "Operador B": 32,
+    "Operador C": 28,
+    "Operador D": 51,
+    "Operador E": 19
+  };
+  
+  const mockSentimentData = {
+    positive: 65,
+    negative: 20,
+    neutral: 15
+  };
+  
+  const mockCommentsData = [
+    { id: 1, text: "Excelente servicio", sentiment: "positive", operator: "Operador A" },
+    { id: 2, text: "Muy mala atención", sentiment: "negative", operator: "Operador B" },
+    { id: 3, text: "Regular, podría mejorar", sentiment: "neutral", operator: "Operador C" }
+  ];
+  
+  // Funciones de la API
+  export const getIssuesByOperator = async () => {
+    // Simulamos delay de API
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(mockIssuesData);
+      }, 500);
+    });
+  };
+  
+  export const getOverallSentiment = async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(mockSentimentData);
+      }, 500);
+    });
+  };
+  
+  export const getComments = async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(mockCommentsData);
+      }, 500);
+    });
+  };
+  
+  export const getIssuesByCategory = async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          "Problemas Técnicos": 25,
+          "Atención al Cliente": 40,
+          "Facturación": 15,
+          "Cobertura": 35
+        });
+      }, 500);
+    });
+  };
+  
+  export const getSentimentTrend = async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve([
+          { month: "Ene", positive: 60, negative: 25, neutral: 15 },
+          { month: "Feb", positive: 62, negative: 23, neutral: 15 },
+          { month: "Mar", positive: 65, negative: 20, neutral: 15 },
+          { month: "Abr", positive: 63, negative: 22, neutral: 15 }
+        ]);
+      }, 500);
+    });
+  };
