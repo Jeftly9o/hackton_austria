@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "nombre": "juan",
+    "asunto": "demora",
+    "contenido": "se tardo el tren",
+    "fecha": "2025-11-23T16:40:35.440Z"
+  },
+  {
+    "nombre": "carlos",
+    "asunto": "delay on subway",
+    "contenido": "subway is stoping too continuous\n",
+    "fecha": "2025-11-23T17:41:02.434Z"
+  },
+  {
+    "nombre": "Erick ",
+    "asunto": "I have a problem with my tickets ",
+    "contenido": "We can't pay our tickets with a credit card ",
+    "fecha": "2025-11-23T17:41:37.140Z"
+  },
+  {
+    "nombre": "raul",
+    "asunto": "retraso",
+    "contenido": "nunca llego el tren",
+    "fecha": "2025-11-23T18:18:06.450Z"
+  }
+]
