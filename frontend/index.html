@@ -2,12 +2,129 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>Transit — demo</title>
+    <style>
+      :root{--accent:#d4001f;--dark:#0b1220;--muted:#6b7280;--card:#ffffff}
+      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial}
+      body{background:linear-gradient(180deg,#f6f7fb 0%, #fff 100%);color:var(--dark)}
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg,rgba(255,255,255,0.7),rgba(255,255,255,0.6));backdrop-filter:blur(6px);position:sticky;top:0;z-index:40;border-bottom:1px solid rgba(11,18,32,0.04)}
+      .brand{display:flex;align-items:center;gap:12px}
+      .logo{width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+      nav a{margin-left:18px;color:var(--muted);text-decoration:none;font-weight:600}
+      .hero{display:grid;grid-template-columns:1fr 480px;gap:32px;align-items:center;padding:56px 6vw}
+      .hero-left h1{font-size:36px;margin:0 0 12px}
+      .hero-left p{margin:0 0 20px;color:var(--muted);max-width:52ch}
+      .search-card{background:linear-gradient(180deg,#fff,#fbfbfd);box-shadow:0 6px 18px rgba(11,18,32,0.06);padding:18px;border-radius:12px;border:1px solid rgba(11,18,32,0.04)}
+      .fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      .field{display:flex;flex-direction:column}
+      label{font-size:12px;color:var(--muted);margin-bottom:6px}
+      input,select{padding:10px 12px;border:1px solid #e6e9ef;border-radius:8px;font-size:14px}
+      .actions{display:flex;gap:10px;margin-top:12px}
+      .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+      .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(212,0,31,0.12)}
+      .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:32px 6vw}
+      .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 16px rgba(11,18,32,0.04);border:1px solid rgba(11,18,32,0.04)}
+      .card h3{margin:0 0 8px}
+      .footer{padding:28px 6vw;border-top:1px solid rgba(11,18,32,0.04);color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+      @media(max-width:900px){.hero{grid-template-columns:1fr;gap:18px;padding:28px} .cards{grid-template-columns:1fr} nav a{display:none}}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">T</div>
+        <div>
+          <div style="font-weight:800">Transit</div>
+          <div style="font-size:12px;color:var(--muted)">Travel & Connections</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#">Plan Journey</a>
+        <a href="#">Tickets</a>
+        <a href="#">Offers</a>
+        <a href="#">Help</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-left">
+          <h1>Fast, simple travel planning</h1>
+          <p>Search connections, compare options and book your trip. This demo shows a clean, responsive search experience inspired by modern rail operator sites.</p>
+          <div style="display:flex;gap:12px;margin-top:20px">
+            <button class="btn">Book a Trip</button>
+            <button class="btn ghost">See Timetables</button>
+          </div>
+        </div>
+
+        <aside>
+          <div class="search-card">
+            <form id="searchForm">
+              <div class="fields">
+                <div class="field">
+                  <label>From</label>
+                  <input type="text" id="from" placeholder="City or station" value="Vienna">
+                </div>
+                <div class="field">
+                  <label>To</label>
+                  <input type="text" id="to" placeholder="City or station" value="Salzburg">
+                </div>
+              </div>
+              <div class="fields" style="margin-top:10px">
+                <div class="field">
+                  <label>Date</label>
+                  <input type="date" id="date">
+                </div>
+                <div class="field">
+                  <label>Passengers</label>
+                  <select id="pax"><option>1 adult</option><option>2 adults</option><option>1 adult, 1 child</option></select>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn" type="submit">Search connections</button>
+                <button class="btn ghost" type="button" id="swapBtn">Swap</button>
+              </div>
+            </form>
+          </div>
+        </aside>
+      </section>
+
+      <section class="cards">
+        <div class="card">
+          <h3>Quick connections</h3>
+          <p style="color:var(--muted)">Find fast direct routes between major cities with seat availability and journey time.</p>
+        </div>
+        <div class="card">
+          <h3>Flexible tickets</h3>
+          <p style="color:var(--muted)">Compare refund and change options so you can travel with confidence.</p>
+        </div>
+        <div class="card">
+          <h3>Travel alerts</h3>
+          <p style="color:var(--muted)">Real-time updates for disruptions and platform changes for your route.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>© Transit Demo — Not affiliated with any operator</div>
+      <div style="font-size:13px;color:var(--muted)">Built for the hackathon — local demo only</div>
+    </footer>
+
+    <script>
+      // Small interactive behaviour for the demo search form
+      document.getElementById('searchForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        const from = document.getElementById('from').value || '—';
+        const to = document.getElementById('to').value || '—';
+        const date = document.getElementById('date').value || 'any date';
+        alert(`Searching connections from ${from} to ${to} on ${date}...\n(This is a demo UI.)`);
+      });
+      document.getElementById('swapBtn').addEventListener('click', function(){
+        const a = document.getElementById('from');
+        const b = document.getElementById('to');
+        const t = a.value; a.value = b.value; b.value = t;
+      });
+    </script>
   </body>
 </html>
