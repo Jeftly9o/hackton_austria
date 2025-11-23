@@ -104,6 +104,14 @@
           <p style="color:var(--muted)">Real-time updates for disruptions and platform changes for your route.</p>
         </div>
       </section>
+      
+      <section id="top30" style="padding:24px 6vw">
+        <h2 style="margin:0 0 12px">Top 30 palabras del contenido de las quejas</h2>
+        <p style="margin:0 0 16px;color:var(--muted)">Most frequent words extracted from the dataset. Hover rows for details, click headers to sort.</p>
+        <div class="card" style="padding:12px">
+          <div id="tableContainer">Loading...</div>
+        </div>
+      </section>
     </main>
 
     <footer class="footer">
@@ -125,6 +133,104 @@
         const b = document.getElementById('to');
         const t = a.value; a.value = b.value; b.value = t;
       });
+      
+      // Top30 table: fetch JSON and render a striking table with bars
+      (function renderTop30(){
+        const container = document.getElementById('tableContainer');
+        const src = './tablas/top30.json';
+        function human(n){ return n.toLocaleString(); }
+        function buildTable(data){
+          if(!data || !data.length){ container.innerHTML = '<div style="color:var(--muted)">No data</div>'; return; }
+          // compute max for bars
+          const max = Math.max(...data.map(d=>d.count));
+          const table = document.createElement('table');
+          table.style.width = '100%';
+          table.style.borderCollapse = 'collapse';
+          table.innerHTML = `
+            <thead>
+              <tr style="text-align:left;color:var(--muted)">
+                <th style="width:64px;cursor:pointer">#</th>
+                <th style="cursor:pointer">Word</th>
+                <th style="width:160px;cursor:pointer">Count</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          `;
+          const tbody = table.querySelector('tbody');
+          data.forEach((row,i)=>{
+            const tr = document.createElement('tr');
+            tr.style.transition = 'background 120ms';
+            tr.onmouseenter = ()=> tr.style.background = 'linear-gradient(90deg, rgba(212,0,31,0.04), rgba(11,18,32,0.02))';
+            tr.onmouseleave = ()=> tr.style.background = 'transparent';
+            const rank = document.createElement('td');
+            rank.innerHTML = `<div style="font-weight:800;color:${i<3? 'var(--accent)':'var(--dark)'}">${i+1}</div>`;
+            const word = document.createElement('td');
+            word.innerHTML = `<div style="font-weight:700;font-size:15px">${escapeHtml(row.word)}</div>`;
+            const countTd = document.createElement('td');
+            const pct = Math.round((row.count/max)*100);
+            countTd.innerHTML = `
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="flex:1;background:#f1f5f9;border-radius:999px;overflow:hidden;height:14px">
+                  <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--accent),#ff6b6b)"></div>
+                </div>
+                <div style="min-width:56px;text-align:right;font-weight:700">${human(row.count)}</div>
+              </div>
+            `;
+            tr.appendChild(rank); tr.appendChild(word); tr.appendChild(countTd);
+            tbody.appendChild(tr);
+          });
+
+          // sorting handlers
+          table.querySelectorAll('th').forEach((th, idx)=>{
+            th.addEventListener('click', ()=>{
+              const asc = th.dataset.asc !== '1';
+              table.querySelectorAll('th').forEach(h=>h.dataset.asc='0');
+              th.dataset.asc = asc ? '1' : '0';
+              let sorted = [...data];
+              if(idx===0){ sorted.sort((a,b)=> asc ? data.indexOf(a)-data.indexOf(b) : data.indexOf(b)-data.indexOf(a)); }
+              if(idx===1){ sorted.sort((a,b)=> asc ? a.word.localeCompare(b.word) : b.word.localeCompare(a.word)); }
+              if(idx===2){ sorted.sort((a,b)=> asc ? a.count-b.count : b.count-a.count); }
+              // rebuild tbody
+              tbody.innerHTML = '';
+              sorted.forEach((row,i)=>{
+                const tr = document.createElement('tr');
+                tr.onmouseenter = ()=> tr.style.background = 'linear-gradient(90deg, rgba(212,0,31,0.04), rgba(11,18,32,0.02))';
+                tr.onmouseleave = ()=> tr.style.background = 'transparent';
+                const rank = document.createElement('td');
+                rank.innerHTML = `<div style="font-weight:800;color:${i<3? 'var(--accent)':'var(--dark)'}">${i+1}</div>`;
+                const word = document.createElement('td');
+                word.innerHTML = `<div style="font-weight:700;font-size:15px">${escapeHtml(row.word)}</div>`;
+                const countTd = document.createElement('td');
+                const pct = Math.round((row.count/max)*100);
+                countTd.innerHTML = `
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="flex:1;background:#f1f5f9;border-radius:999px;overflow:hidden;height:14px">
+                      <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--accent),#ff6b6b)"></div>
+                    </div>
+                    <div style="min-width:56px;text-align:right;font-weight:700">${human(row.count)}</div>
+                  </div>
+                `;
+                tr.appendChild(rank); tr.appendChild(word); tr.appendChild(countTd);
+                tbody.appendChild(tr);
+              });
+            });
+          });
+
+          container.innerHTML = '';
+          container.appendChild(table);
+        }
+
+        function escapeHtml(s){ return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        fetch(src).then(r=>r.json()).then(data=>{
+          // ensure entries sorted by count desc
+          data.sort((a,b)=>b.count - a.count);
+          buildTable(data);
+        }).catch(err=>{
+          container.innerHTML = `<div style="color:#a00">Failed to load data: ${escapeHtml(err.message || err)}</div>`;
+          console.error(err);
+        });
+      })();
     </script>
   </body>
 </html>
