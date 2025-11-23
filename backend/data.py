@@ -30,8 +30,10 @@ def analizar_correo_local(asunto, contenido):
     
     Responde ÚNICAMENTE con un JSON válido con este formato exacto:
     {{
+        "Calidad: "buena/regular/mala",
+        "Categorías": "retrasos, limpieza, seguridad, horarios, atención o 'otros'",
         "sentimiento": "Positivo/Negativo/Neutral",
-        "problemas": "identifica el problema y devuelve solo las palabras clave como "Saturación" refiriendose a Aglomeraciones,"Retrasos","Averías" si hay averías Mecánicas/Eléctricas,"Obsolescencia" si hay Infraestructura antigua,"Inseguridad" si hay Robos,Acoso o Vandalismo","otros" en caso de que no encaje en las anteriores",
+        "problemas": "Resumen muy breve del problema o 'Ninguno'",
         "calificacion": Entero del 1 al 10
     }}
     """
