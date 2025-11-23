@@ -1,64 +1,37 @@
 import pandas as pd
-from ntscraper import Nitter
-from time import sleep
+from textblob import TextBlob  
 
-def buscar_tweets(termino, cantidad=10, desde=None, hasta=None):
-    """
-    Busca tweets usando Nitter (para evitar la API de pago de Twitter).
-    """
-    print(f"🔎 Buscando '{termino}'... esto puede tardar unos segundos dependiendo de la instancia de Nitter.")
-    
-    scraper = Nitter(log_level=1, skip_instance_check=False)
-    
-    # Realizamos la búsqueda
-    # mode='term' busca la palabra clave. 
-    # mode='hashtag' buscaría #Palabra
-    tweets_data = scraper.get_tweets(
-        termino,
-        mode='term',
-        number=cantidad,
-        since=desde, # Formato "2023-01-01" (Opcional)
-        until=hasta  # Formato "2023-12-31" (Opcional)
-    )
-    
-    lista_final = []
-    
-    # Filtramos y limpiamos los datos
-    if tweets_data.get('tweets'):
-        for tweet in tweets_data['tweets']:
-            datos = {
-                'fecha': tweet['date'],
-                'texto': tweet['text'],
-                'usuario': tweet['user']['username'],
-                'enlace': tweet['link']
-            }
-            lista_final.append(datos)
-            
-        return lista_final
-    else:
-        print("⚠️ No se encontraron tweets o hubo un error con la instancia.")
-        return []
+df = pd.read_csv('tu_archivo.csv')
 
-# --- CONFIGURACIÓN ---
-PALABRA_CLAVE = "Metro CDMX"
-CANTIDAD = 50  # Número de tweets a bajar
+columnas_requeridas = [
+    'Nombre_remitente',
+    'Email_remitente',
+    'Nombre_destinatario',
+    'Email_destinatario',
+    'Asunto',
+    'Contenido',
+    'Fecha',
+    'Message-ID'
+]
 
-# --- EJECUCIÓN ---
-if __name__ == "__main__":
-    resultados = buscar_tweets(PALABRA_CLAVE, CANTIDAD)
+df.columns = [c.strip() for c in df.columns] 
+
+reseñas = []
+for _, row in df.iterrows():
+    contenido = str(row['Contenido'])
     
-    if resultados:
-        # Crear un DataFrame con Pandas
-        df = pd.DataFrame(resultados)
-        
-        # Guardar en CSV
-        nombre_archivo = "tweets_metro.csv"
-        df.to_csv(nombre_archivo, index=False, encoding='utf-8')
-        
-        print(f"\n✅ Éxito. Se guardaron {len(df)} tweets en '{nombre_archivo}'")
-        
-        # Muestra los primeros 3 resultados en pantalla
-        print("\n--- Ejemplo de datos ---")
-        print(df[['fecha', 'texto']].head(3))
-    else:
-        print("❌ No se pudieron guardar datos.")
+    analysis = TextBlob(contenido)
+    polaridad = analysis.sentiment.polarity  # Rango: [-1, 1]
+
+    reseña_escala = (polaridad + 1) * 2.5  # Ejemplo: -1 -> 1, 0 -> 3, 1 -> 5
+    reseñas.append(reseña_escala)
+
+    # Opcional: Imprimir datos procesados
+    print(f"Remitente: {row['Nombre_remitente']} | Asunto: {row['Asunto']} | Reseña: {reseña_escala:.2f}")
+
+# Calcular reseña promedio
+if reseñas:
+    reseña_promedio = sum(reseñas) / len(reseñas)
+    print(f"\n--- Reseña Promedio de todos los datos: {reseña_promedio:.2f} ---")
+else:
+    print("No se encontraron datos para analizar.")
