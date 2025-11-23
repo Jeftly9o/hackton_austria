@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diseño Bonito 1 — Transit Demo</title>
+    <style>
+      :root{--accent:#d4001f;--dark:#0b1220;--muted:#6b7280;--card:#ffffff}
+      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial}
+      body{background:linear-gradient(180deg,#f6f7fb 0%, #fff 100%);color:var(--dark)}
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg,rgba(255,255,255,0.7),rgba(255,255,255,0.6));backdrop-filter:blur(6px);position:sticky;top:0;z-index:40;border-bottom:1px solid rgba(11,18,32,0.04)}
+      .brand{display:flex;align-items:center;gap:12px}
+      .logo{width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+      nav a{margin-left:18px;color:var(--muted);text-decoration:none;font-weight:600}
+      .hero{display:grid;grid-template-columns:1fr;gap:32px;align-items:center;padding:56px 6vw}
+      .hero-left h1{font-size:36px;margin:0 0 12px}
+      .hero-left p{margin:0 0 20px;color:var(--muted);max-width:52ch}
+      .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+      .footer{padding:28px 6vw;border-top:1px solid rgba(11,18,32,0.04);color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+      @media(max-width:900px){.hero{padding:28px} nav a{display:none}}
+    </style>
+</head>
+<body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">T</div>
+        <div>
+          <div style="font-weight:800">Transit</div>
+          <div style="font-size:12px;color:var(--muted)">Travel & Connections</div>
+        </div>
+      </div>
+      <nav>
+        <a href="index.html">Plan Journey</a>
+        <a href="#">Tickets</a>
+        <a href="#">Offers</a>
+        <a href="#">Help</a>
+        <a href="index2.html">diseno bonito 1</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-left">
+          <h1>Página de Diseño Bonito 1</h1>
+          <p>Este es el contenido de la nueva página. Mantiene el mismo estilo visual que la página principal para una experiencia de usuario consistente.</p>
+          <div style="display:flex;gap:12px;margin-top:20px">
+            <a href="index.html" class="btn">Volver al Inicio</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>© Transit Demo — Not affiliated with any operator</div>
+      <div style="font-size:13px;color:var(--muted)">Built for the hackathon — local demo only</div>
+    </footer>
+</body>
+</html>

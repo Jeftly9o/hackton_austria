@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transit — Help</title>
+    <style>
+      :root{--accent:#d4001f;--dark:#0b1220;--muted:#6b7280;--card:#ffffff}
+      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial}
+      body{background:linear-gradient(180deg,#f6f7fb 0%, #fff 100%);color:var(--dark)}
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg,rgba(255,255,255,0.7),rgba(255,255,255,0.6));backdrop-filter:blur(6px);position:sticky;top:0;z-index:40;border-bottom:1px solid rgba(11,18,32,0.04)}
+      .brand{display:flex;align-items:center;gap:12px}
+      .logo{width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+      nav a{margin-left:18px;color:var(--muted);text-decoration:none;font-weight:600}
+      .hero{display:grid;grid-template-columns:1fr;gap:32px;align-items:center;padding:56px 6vw}
+      .hero-left h1{font-size:36px;margin:0 0 12px}
+      .hero-left p{margin:0 0 20px;color:var(--muted);max-width:52ch}
+      .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 16px rgba(11,18,32,0.04);border:1px solid rgba(11,18,32,0.04)}
+      .footer{padding:28px 6vw;border-top:1px solid rgba(11,18,32,0.04);color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+      .faq-item { margin-bottom: 20px; }
+      .faq-item h3 { margin-bottom: 8px; }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">T</div>
+        <div>
+          <div style="font-weight:800">Transit</div>
+          <div style="font-size:12px;color:var(--muted)">Travel & Connections</div>
+        </div>
+      </div>
+      <nav>
+        <a href="index.html">Inicio</a>
+        <a href="#">Tickets</a>
+        <a href="#">Offers</a>
+        <a href="help.html">Help</a>
+        <a href="index2.html">graficas de quejas</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-left">
+          <h1>Help & Frequently Asked Questions</h1>
+          <p>Find answers to common questions about the sentiment analysis dashboard.</p>
+        </div>
+      </section>
+
+      <section class="cards" style="padding-top: 0;">
+        <div class="card">
+          <div class="faq-item">
+            <h3>¿Qué información muestra el dashboard?</h3>
+            <p style="color:var(--muted)">El dashboard presenta un análisis de sentimiento de los comentarios de los usuarios, extraídos de diversas fuentes. Muestra las palabras más frecuentes, el sentimiento general (positivo, negativo, neutral) y las quejas más comunes.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿De dónde provienen los datos?</h3>
+            <p style="color:var(--muted)">Los datos se recopilan de fuentes públicas, como redes sociales y foros de discusión. Para esta demostración, utilizamos un conjunto de datos de ejemplo.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Cómo se calcula el sentimiento?</h3>
+            <p style="color:var(--muted)">Utilizamos un modelo de procesamiento de lenguaje natural (NLP) para analizar el texto de cada comentario y asignarle una puntuación de sentimiento. Esta puntuación se clasifica como positiva, negativa o neutral.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Qué es la nube de palabras?</h3>
+            <p style="color:var(--muted)">La nube de palabras es una representación visual de las palabras más frecuentes en los comentarios. Cuanto más grande es una palabra, más a menudo aparece.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Puedo filtrar los datos?</h3>
+            <p style="color:var(--muted)">En la versión actual de la demostración, los filtros no están habilitados. Sin embargo, en una versión completa, se podría filtrar por fecha, fuente de datos o categoría de queja.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>© Transit Demo — Not affiliated with any operator</div>
+      <div style="font-size:13px;color:var(--muted)">Built for the hackathon — local demo only</div>
+    </footer>
+  </body>
+</html>

@@ -1,3 +1,4 @@
+
 import pandas as pd
 import ollama
 import os
@@ -7,36 +8,9 @@ import json
 from flask import Flask, jsonify
 from flask_cors import CORS
 
-current_dir = Path(__file__).resolve().parent
-csv_path = current_dir.parent / 'database' / 'base_datos.csv'
-print(f"Buscando archivo en: {csv_path}")
-if not csv_path.exists():
-    print("Error: No se encuentra el archivo")
-    sys.exit(1)
-
 app = Flask(__name__)
 # Habilita CORS para permitir peticiones desde React
 CORS(app)
-@app.route('/api/analisis-individual', methods=['GET'])
-def obtener_datos():
-    respuesta = {
-        "asunto":{asunto},
-        "contenido":{contenido},
-        "sentimiento": resultado['sentimiento'],
-        "problemas": resultado['problemas'],
-        "calificacion": resultado['calificacion']   
-    }
-
-    return jsonify(respuesta)
-@app.route('/api/resumen-global', methods=['GET'])
-def obtener_datos_finales():
-    respuesta_final = {
-        "problemas_detectados": todos_los_problemas,
-        "calificacion_promedio": promedio,
-        "resumen_ejecutivo": resumen['message']['content']
-    }
-    return jsonify(respuesta_final)
-
 
 def analizar_correo_local(asunto, contenido):
     prompt = f"""
@@ -64,57 +38,86 @@ def analizar_correo_local(asunto, contenido):
         else:
             return {"sentimiento": "Neutral", "problemas": "Error Formato", "calificacion": 5}
     except Exception as e:
-        return {"sentimiento": "Error", "problemas": f"Error: {e}", "calificacion": 0}
+        return {"sentimiento": "Error", "problemas": str(e), "calificacion": 0}
+
+def process_data(df):
+    resultados_individuales = []
+    todos_los_problemas = []
+    todas_las_calificaciones = []
+
+    for _, row in df.iterrows():
+        asunto = row['Asunto']
+        contenido = row['Contenido']
+        
+        resultado = analizar_correo_local(asunto, contenido)
+        
+        resultados_individuales.append({
+            "asunto": asunto,
+            "contenido": contenido,
+            "sentimiento": resultado["sentimiento"],
+            "problemas": resultado["problemas"],
+            "calificacion": resultado["calificacion"]
+        })
+
+        if resultado['problemas'] not in ['Ninguno', 'Error', 'Error Formato']:
+            todos_los_problemas.append(resultado['problemas'])
+        
+        if isinstance(resultado['calificacion'], (int, float)) and resultado['calificacion'] > 0:
+            todas_las_calificaciones.append(resultado['calificacion'])
+
+    promedio = sum(todas_las_calificaciones) / len(todas_las_calificaciones) if todas_las_calificaciones else 0
+
+    return resultados_individuales, todos_los_problemas, promedio
+
+def generate_summary(todos_los_problemas, promedio):
+    texto_problemas = "\n- ".join(todos_los_problemas) 
+
+    prompt_final = f"""
+    Genera un resumen ejecutivo breve basado en estos datos:
+    1. Lista de problemas detectados:
+    {texto_problemas}
     
-try:
-    df = pd.read_csv(csv_path)
-    df = df.head(5)
-except Exception as e:
-    sys.exit(1)
-
-todos_los_problemas = []
-todas_las_calificaciones = []
-
-for index, row in df.iterrows():
-    asunto = row['Asunto']
-    contenido = row['Contenido']
+    2. Calificación promedio matemática calculada: {promedio:.2f}/10
     
-    resultado = analizar_correo_local(asunto, contenido)
-    enviar=obtener_datos
-    if resultado['problemas'] != 'Ninguno' and resultado['problemas'] != 'Error':
-        todos_los_problemas.append(resultado['problemas'])
+    Dame:
+    - Los 3 problemas principales.
+    - Una conclusión de la calidad del servicio.
+    """
+    try:
+        resumen = ollama.chat(model='llama3.1', messages=[
+            {'role': 'user', 'content': prompt_final}
+        ])
+        return resumen["message"]["content"]
+    except Exception as e:
+        return f"Error al generar el resumen: {e}"
+
+def create_app():
+    current_dir = Path(__file__).resolve().parent
+    csv_path = current_dir.parent / 'database' / 'base_datos.csv'
     
-    if isinstance(resultado['calificacion'], (int, float)) and resultado['calificacion'] > 0:
-        todas_las_calificaciones.append(resultado['calificacion'])
+    if not csv_path.exists():
+        print(f"Error: No se encuentra el archivo en {csv_path}")
+        sys.exit(1)
+    
+    df = pd.read_csv(csv_path).head(5)
+    
+    resultados_individuales, todos_los_problemas, promedio = process_data(df)
+    resumen_texto = generate_summary(todos_los_problemas, promedio)
 
-print("\n Generando Resumen General...\n")
+    @app.route('/api/analisis-individual', methods=['GET'])
+    def obtener_datos():
+        return jsonify(resultados_individuales)
 
-if todas_las_calificaciones:
-    promedio = sum(todas_las_calificaciones) / len(todas_las_calificaciones)
-else:
-    promedio = 0
+    @app.route('/api/resumen-global', methods=['GET'])
+    def obtener_datos_finales():
+        respuesta_final = {
+            "problemas_detectados": todos_los_problemas,
+            "calificacion_promedio": promedio,
+            "resumen_ejecutivo": resumen_texto
+        }
+        return jsonify(respuesta_final)
+    return app
 
-texto_problemas = "\n- ".join(todos_los_problemas[:50]) 
-
-prompt_final = f"""
-Genera un resumen ejecutivo breve basado en estos datos:
-1. Lista de problemas detectados:
-{texto_problemas}
-
-2. Calificación promedio matemática calculada: {promedio:.2f}/10
-
-Dame:
-- Los 3 problemas principales.
-- Una conclusión de la calidad del servicio.
-"""
-
-try:
-    resumen = ollama.chat(model='llama3.1', messages=[
-        {'role': 'user', 'content': prompt_final}
-    ])
-except Exception as e:
-    resumen = {"message": {"content": "Error al generar el resumen."}}
-    enviar_final=obtener_datos_finales
-
-app.run(debug=True, port=5000)
-
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True, port=5000)
