@@ -1,1 +1,25 @@
-[]]
+[
+  {
+    "nombre": "lala",
+    "gusto": "si",
+    "fecha": "2025-11-23T11:01:54.018Z"
+  },
+  {
+    "nombre": "Ayuda ",
+    "asunto": "Un león ",
+    "contenido": "Chicle ",
+    "fecha": "2025-11-23T11:10:23.903Z"
+  },
+  {
+    "nombre": "W",
+    "asunto": "Un gordo arch",
+    "contenido": "Que chsm el américa ",
+    "fecha": "2025-11-23T11:12:12.785Z"
+  },
+  {
+    "nombre": "Ayo",
+    "asunto": "Sexo",
+    "contenido": "Sexo",
+    "fecha": "2025-11-23T11:12:34.983Z"
+  }
+]

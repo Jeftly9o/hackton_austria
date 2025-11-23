@@ -3,77 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encuesta Final</title>
+    <title>Enviar Reporte — Transit Demo</title>
+    <style>
+        :root{--accent:#d4001f;--accent-dark:#a30018;--dark:#0b1220;--muted:#6b7280;--bg:#f0f2f5;--card:#ffffff}
+        html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+        body{background:var(--bg);color:var(--dark)}
+
+        /* --- HEADER & NAV --- */
+        .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1);position:sticky;top:0;z-index:100}
+        .brand{display:flex;align-items:center;gap:10px}
+        .logo{width:36px;height:36px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+        
+        nav { display: flex; gap: 5px; }
+        nav a{color:var(--muted);text-decoration:none;font-weight:500; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: all 0.2s;}
+        nav a:hover { background: #eee; color: var(--accent); }
+        nav a.active { color: var(--accent); background: #fff0f2; }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        .main-container {
+            max-width: 600px; /* Ancho ideal para formularios */
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-header h1 { margin: 0 0 10px; font-size: 24px; color: var(--dark); font-weight: 800; }
+        .form-header p { margin: 0 0 30px; color: var(--muted); font-size: 14px; }
+
+        /* --- ESTILOS DEL FORMULARIO --- */
+        .form-group { margin-bottom: 20px; }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--dark);
+        }
+
+        input[type="text"], 
+        textarea, 
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            box-sizing: border-box; /* Importante para que no se salga del ancho */
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(212, 0, 31, 0.1);
+        }
+
+        textarea { resize: vertical; min-height: 100px; }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button[type="submit"]:hover { background-color: var(--accent-dark); }
+
+        /* --- MENSAJES DE ESTADO (SIN ALERTAS) --- */
+        #status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none; /* Oculto por defecto */
+            text-align: center;
+        }
+        .success { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .error { background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        .footer { text-align: center; margin-top: 40px; color: var(--muted); font-size: 12px; }
+
+        @media(max-width: 600px) {
+            .form-card { padding: 25px; }
+            nav { display: none; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Encuesta de Satisfacción</h1>
-    
-    <form id="miEncuesta" style="background: #f4f4f4; padding: 20px;">
-        <label>Nombre:</label><br>
-        <input type="text" id="nombre" required><br><br>
 
-        <label>¿Te gusta programar?</label><br>
-        <select id="gusto">
-            <option value="si">Sí</option>
-            <option value="no">No</option>
-        </select><br><br>
+    <header class="topbar">
+        <div class="brand">
+            <div class="logo">T</div>
+            <div style="font-weight:800; font-size:18px;">Transit</div>
+        </div>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="index3.html" class="active">Reportar</a> <a href="index2.html">Gráficas</a>
+        </nav>
+    </header>
 
-        <button type="submit" style="padding: 10px 20px; font-size: 16px;">Enviar Respuesta</button>
-    </form>
-    
-    <div id="status" style="margin-top: 20px; color: red;"></div>
+    <main class="main-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1>Nuevo Reporte</h1>
+                <p>Completa los detalles a continuación. La fecha se registrará automáticamente.</p>
+            </div>
+
+            <form id="miEncuesta">
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo</label>
+                    <input type="text" id="nombre" placeholder="Tu nombre..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="asunto">Asunto del Reporte</label>
+                    <input type="text" id="asunto" placeholder="Ej: Retraso en línea 3" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contenido">Contenido del Reporte</label>
+                    <textarea id="contenido" placeholder="Describe los detalles de la situación..." required></textarea>
+                </div>
+
+                <button type="submit" id="btnEnviar">Enviar Reporte</button>
+            </form>
+
+            <div id="status-message"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        © Transit Demo — Hackathon 2025
+    </footer>
 
     <script>
-        // Alerta 1: Verificar que el script cargó
-        console.log("Script cargado correctamente");
-
         const form = document.getElementById('miEncuesta');
+        const statusDiv = document.getElementById('status-message');
+        const btnEnviar = document.getElementById('btnEnviar');
 
-        if (!form) {
-            alert("❌ ERROR GRAVE: No encuentro el formulario con id='miEncuesta'");
-        } else {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault(); 
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Evita recarga
 
-                // Alerta 2: Confirmar clic
-                alert("1. Botón presionado. Preparando datos...");
+            // 1. Mostrar estado de "Cargando"
+            btnEnviar.disabled = true;
+            btnEnviar.innerText = "Enviando...";
+            statusDiv.style.display = 'none';
 
-                try {
-                    const nombreVal = document.getElementById('nombre').value;
-                    const gustoVal = document.getElementById('gusto').value;
+            // 2. Recolectar datos
+            const data = {
+                nombre: document.getElementById('nombre').value,
+                asunto: document.getElementById('asunto').value,       // Nuevo campo
+                contenido: document.getElementById('contenido').value, // Nuevo campo
+                fecha: new Date().toISOString() // Fecha automática
+            };
 
-                    const data = {
-                        nombre: nombreVal,
-                        gusto: gustoVal,
-                        fecha: new Date().toISOString()
-                    };
-
-                    // Alerta 3: Datos listos
-                    alert("2. Datos listos: " + JSON.stringify(data) + ". Enviando al servidor...");
-
-                    fetch('/guardar-encuesta', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Error del servidor: ' + response.status);
-                        return response.text();
-                    })
-                    .then(texto => {
-                        alert("✅ 3. ¡ÉXITO TOTAL! El servidor respondió: " + texto);
-                        document.getElementById('miEncuesta').reset();
-                    })
-                    .catch(error => {
-                        alert("❌ 3. FALLÓ EL ENVÍO: " + error.message);
-                        document.getElementById('status').innerText = "Error: " + error.message;
-                    });
-
-                } catch (err) {
-                    alert("❌ Error interno en JS: " + err.message);
-                }
+            // 3. Enviar al servidor
+            fetch('/guardar-encuesta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Error al conectar con el servidor');
+                return response.text();
+            })
+            .then(texto => {
+                // 4. ÉXITO (Mensaje Verde)
+                statusDiv.innerText = "✅ Reporte enviado y guardado correctamente.";
+                statusDiv.className = "success";
+                statusDiv.style.display = "block";
+                form.reset(); // Limpiar formulario
+            })
+            .catch(error => {
+                // 5. ERROR (Mensaje Rojo)
+                console.error(error);
+                statusDiv.innerText = "❌ No se pudo enviar: " + error.message;
+                statusDiv.className = "error";
+                statusDiv.style.display = "block";
+            })
+            .finally(() => {
+                // Restaurar botón
+                btnEnviar.disabled = false;
+                btnEnviar.innerText = "Enviar Reporte";
             });
-        }
+        });
     </script>
+
 </body>
 </html>

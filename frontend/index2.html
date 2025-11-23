@@ -3,56 +3,289 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Diseño Bonito 1 — Transit Demo</title>
+    <title>Dashboard Avanzado — Transit Demo</title>
     <style>
-      :root{--accent:#d4001f;--dark:#0b1220;--muted:#6b7280;--card:#ffffff}
-      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial}
-      body{background:linear-gradient(180deg,#f6f7fb 0%, #fff 100%);color:var(--dark)}
-      .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(90deg,rgba(255,255,255,0.7),rgba(255,255,255,0.6));backdrop-filter:blur(6px);position:sticky;top:0;z-index:40;border-bottom:1px solid rgba(11,18,32,0.04)}
-      .brand{display:flex;align-items:center;gap:12px}
-      .logo{width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
-      nav a{margin-left:18px;color:var(--muted);text-decoration:none;font-weight:600}
-      .hero{display:grid;grid-template-columns:1fr;gap:32px;align-items:center;padding:56px 6vw}
-      .hero-left h1{font-size:36px;margin:0 0 12px}
-      .hero-left p{margin:0 0 20px;color:var(--muted);max-width:52ch}
-      .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
-      .footer{padding:28px 6vw;border-top:1px solid rgba(11,18,32,0.04);color:var(--muted);display:flex;justify-content:space-between;align-items:center}
-      @media(max-width:900px){.hero{padding:28px} nav a{display:none}}
+      :root{--accent:#d4001f;--accent-dark:#a30018;--dark:#0b1220;--muted:#6b7280;--bg:#f0f2f5}
+      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+      body{background:var(--bg);color:var(--dark)}
+      
+      /* --- HEADER & NAV --- */
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1);position:sticky;top:0;z-index:100}
+      .brand{display:flex;align-items:center;gap:10px}
+      .logo{width:36px;height:36px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+      .brand-text div:first-child{font-weight:800; font-size:18px;}
+      
+      nav { display: flex; gap: 5px; }
+      nav a{color:var(--muted);text-decoration:none;font-weight:500; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: all 0.2s;}
+      nav a:hover { background: #eee; color: var(--accent); }
+      nav a.active { color: var(--accent); background: #fff0f2; }
+
+      /* --- LAYOUT --- */
+      .hero{padding:30px 4vw; max-width: 1600px; margin: 0 auto;} /* Más ancho para que quepa la tabla grande */
+      .hero-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: end;}
+      .hero-header h1{font-size:28px;margin:0 0 5px; font-weight: 800; color: #1a1a1a;}
+      .hero-header p{margin:0;color:var(--muted); font-size: 14px;}
+      
+      .btn{background:var(--accent);color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-weight:600;text-decoration: none; font-size: 13px; transition: background 0.2s;}
+      .btn:hover { background: var(--accent-dark); }
+      
+      /* --- GRID DASHBOARD --- */
+      .dashboard-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+          gap: 25px;
+      }
+
+      /* CLASE ESPECIAL PARA LA TABLA GIGANTE */
+      .data-card.full-width {
+          grid-column: 1 / -1; /* Ocupa todas las columnas */
+          height: 650px;       /* Mucho más alta */
+          border: 2px solid var(--dark); /* Borde destacado */
+      }
+
+      .data-card {
+          background: #fff;
+          border-radius: 10px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          border: 1px solid #e5e7eb;
+          height: 450px; /* Altura estándar para las pequeñas */
+      }
+
+      .card-header {
+          padding: 12px 16px;
+          background: linear-gradient(to right, #ffffff, #f9fafb);
+          border-bottom: 1px solid #e5e7eb;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      .card-header h3 { margin: 0; font-size: 15px; font-weight: 700; color: #111827;}
+      .badge { background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+
+      /* --- ESTILOS DE TABLA AVANZADOS --- */
+      .table-container {
+          overflow: auto; 
+          flex: 1; 
+      }
+      
+      /* Scrollbars finos */
+      .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+      .table-container::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+      .table-container::-webkit-scrollbar-track { background: #f1f1f1; }
+
+      table {
+          width: 100%;
+          border-collapse: separate; /* Necesario para sticky headers complejos */
+          border-spacing: 0;
+          font-size: 12px;
+          white-space: nowrap;
+      }
+
+      td, th {
+          padding: 8px 12px;
+          border-bottom: 1px solid #e5e7eb;
+          border-right: 1px solid #f3f4f6;
+      }
+
+      /* -- ENCABEZADOS SUPERIORES (STICKY TOP) -- */
+      th {
+          background: var(--dark);
+          color: #fff;
+          font-weight: 600;
+          text-align: left;
+          position: sticky;
+          top: 0;
+          z-index: 20; /* Encima del contenido normal */
+          text-transform: uppercase;
+          font-size: 10px;
+          letter-spacing: 0.5px;
+      }
+
+      /* -- PRIMERA COLUMNA (STICKY LEFT & NEGRA) -- */
+      td:first-child, th:first-child {
+          position: sticky;
+          left: 0;
+      }
+
+      /* Estilo específico de la celda de datos (TD) de la primera columna */
+      td:first-child {
+          background-color: var(--dark);
+          color: #fff;
+          font-weight: bold;
+          z-index: 10; /* Encima del scroll horizontal, debajo del header */
+          font-size: 11px;
+      }
+
+      /* ESQUINA SUPERIOR IZQUIERDA (DONDE SE CRUZAN LOS HEADERS) */
+      th:first-child {
+          z-index: 30; /* El rey de la colina: encima de todo */
+          background-color: var(--dark); /* Asegurar que no sea transparente */
+          border-right: 1px solid #333;
+      }
+
+      tr:nth-child(even) td:not(:first-child) { background-color: #f9fafb; }
+      tr:hover td:not(:first-child) { background-color: #fff1f2; color: var(--accent-dark); }
+      
+      .footer{padding:30px 4vw; border-top:1px solid #e5e7eb;color:var(--muted);display:flex;justify-content:space-between;font-size: 12px;}
+      
+      @media(max-width:768px){
+          .dashboard-grid { grid-template-columns: 1fr; }
+          nav { display: none; }
+          .hero{padding: 20px;}
+      }
     </style>
 </head>
 <body>
     <header class="topbar">
       <div class="brand">
         <div class="logo">T</div>
-        <div>
-          <div style="font-weight:800">Transit</div>
-          <div style="font-size:12px;color:var(--muted)">Travel & Connections</div>
+        <div class="brand-text">
+          <div>Transit</div>
+          <div style="font-size:11px;color:var(--muted)">Data Dashboard</div>
         </div>
       </div>
       <nav>
-        <a href="index.html">Plan Journey</a>
-        <a href="#">Tickets</a>
-        <a href="#">Offers</a>
-        <a href="#">Help</a>
-        <a href="index2.html">diseno bonito 1</a>
+        <a href="index.html">Inicio</a>
+        <a href="index3.html" class="active">Formulario</a>
+        <a href="index2.html">Gráficas</a>
       </nav>
     </header>
 
     <main>
       <section class="hero">
-        <div class="hero-left">
-          <h1>Página de Diseño Bonito 1</h1>
-          <p>Este es el contenido de la nueva página. Mantiene el mismo estilo visual que la página principal para una experiencia de usuario consistente.</p>
-          <div style="display:flex;gap:12px;margin-top:20px">
-            <a href="index.html" class="btn">Volver al Inicio</a>
+        <div class="hero-header">
+          <div>
+              <h1>Monitor de Datos</h1>
+              <p>Visualización de matrices complejas y reportes.</p>
           </div>
+          <a href="index.html" class="btn">← Volver</a>
         </div>
+
+        <div id="tablas-container" class="dashboard-grid">
+            <p style="text-align: center; grid-column: 1/-1; padding: 40px; color: #666;">Cargando...</p>
+        </div>
+
       </section>
     </main>
 
     <footer class="footer">
-      <div>© Transit Demo — Not affiliated with any operator</div>
-      <div style="font-size:13px;color:var(--muted)">Built for the hackathon — local demo only</div>
+      <div>© Transit Demo — Hackathon 2025</div>
+      <div>v3.0 Matrix View</div>
     </footer>
+
+    <script>
+        // CONFIGURACIÓN: Aquí definimos qué tabla es la "Gigante" (grande: true)
+        const archivos = [
+            { 
+                url: 'tablas/cooccurrence.json', 
+                titulo: 'Matriz de Co-ocurrencia (Completa)', 
+                grande: true // <--- ¡ESTO HACE QUE SEA LA TABLA GRANDE!
+            }, 
+            { url: 'tablas/content_top30.json', titulo: 'Content Top 30' },
+            { url: 'tablas/top10_triples.json', titulo: 'Top 10 Triples' },
+            { url: 'tablas/top30.json', titulo: 'Top 30 General' }
+        ];
+
+        function crearTablaHTML(data, config) {
+            let columnas = [];
+            let filasHTML = '';
+            let totalFilas = 0;
+
+            // Determinar clase CSS (Grande vs Normal)
+            const claseTarjeta = config.grande ? 'data-card full-width' : 'data-card';
+
+            // ---------------------------------------------------------
+            // CASO 1: Formato "Pandas" (Tiene "columns", "index" y "data")
+            // ---------------------------------------------------------
+            if (data.columns && data.data) {
+                // Las columnas son lo que viene en el JSON
+                columnas = data.columns;
+                
+                // Si existe 'index', agregamos una columna vacía al inicio para la esquina
+                if (data.index) {
+                    columnas = ["METRIC", ...columnas];
+                }
+
+                totalFilas = data.data.length;
+                
+                filasHTML = data.data.map((filaDatos, i) => {
+                    let celdasHTML = '';
+
+                    // 1. Primero agregamos la celda del "Index" (La negra a la izquierda)
+                    if (data.index) {
+                        celdasHTML += `<td>${data.index[i]}</td>`;
+                    }
+
+                    // 2. Luego agregamos el resto de datos
+                    celdasHTML += filaDatos.map(dato => `<td>${dato}</td>`).join('');
+                    
+                    return `<tr>${celdasHTML}</tr>`;
+                }).join('');
+            }
+            
+            // ---------------------------------------------------------
+            // CASO 2: Formato Estándar ([{}, {}, {}])
+            // ---------------------------------------------------------
+            else if (Array.isArray(data) && data.length > 0) {
+                columnas = Object.keys(data[0]);
+                totalFilas = data.length;
+
+                filasHTML = data.map(fila => {
+                    let celdas = columnas.map(col => `<td>${fila[col] || ''}</td>`).join('');
+                    return `<tr>${celdas}</tr>`;
+                }).join('');
+            }
+            
+            // CASO ERROR
+            else {
+                return `<div class="${claseTarjeta}"><div style="padding:20px">Sin datos</div></div>`;
+            }
+
+            // Generar Headers
+            let headersHTML = columnas.map(col => `<th>${col}</th>`).join('');
+
+            return `
+            <div class="${claseTarjeta}">
+                <div class="card-header">
+                    <h3>${config.titulo}</h3>
+                    <span class="badge">${totalFilas} Registros</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr>${headersHTML}</tr></thead>
+                        <tbody>${filasHTML}</tbody>
+                    </table>
+                </div>
+            </div>`;
+        }
+
+        async function cargarTablas() {
+            const container = document.getElementById('tablas-container');
+            container.innerHTML = '';
+
+            for (const archivo of archivos) {
+                try {
+                    const response = await fetch(archivo.url);
+                    if (!response.ok) throw new Error('Error de red');
+                    const datos = await response.json();
+                    
+                    // Pasamos el objeto 'archivo' completo para leer si es 'grande'
+                    container.innerHTML += crearTablaHTML(datos, archivo); 
+                    
+                } catch (error) {
+                    console.error(error);
+                    container.innerHTML += `
+                    <div class="data-card" style="border-left: 4px solid red; padding: 20px;">
+                        Error cargando: ${archivo.titulo}
+                    </div>`;
+                }
+            }
+        }
+
+        cargarTablas();
+    </script>
 </body>
 </html>
