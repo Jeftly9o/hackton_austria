@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 import sys
 import json
+from flask import Flask, jsonify
+from flask_cors import CORS
 
 current_dir = Path(__file__).resolve().parent
 csv_path = current_dir.parent / 'database' / 'base_datos.csv'
@@ -11,6 +13,31 @@ print(f"Buscando archivo en: {csv_path}")
 if not csv_path.exists():
     print("Error: No se encuentra el archivo")
     sys.exit(1)
+
+app = Flask(__name__)
+# Habilita CORS para permitir peticiones desde React
+CORS(app)
+@app.route('/api/llama', methods=['GET'])
+
+
+def obtener_datos():
+    respuesta = {
+        "asunto":{asunto},
+        "contenido":{contenido},
+        "sentimiento": resultado['sentimiento'],
+        "problemas": resultado['problemas'],
+        "calificacion": resultado['calificacion']   
+    }
+
+    return jsonify(respuesta)
+def obtener_datos_finales():
+    respuesta_final = {
+        "problemas_detectados": todos_los_problemas,
+        "calificacion_promedio": promedio,
+        "resumen_ejecutivo": resumen['message']['content']
+    }
+    return {"mensaje": "API funcionando correctamente"}
+
 
 def analizar_correo_local(asunto, contenido):
     prompt = f"""
@@ -42,11 +69,9 @@ def analizar_correo_local(asunto, contenido):
     
 try:
     df = pd.read_csv(csv_path)
+    df = df.head(5)
 except Exception as e:
-    print(f"Error al abrir el archivo: {e}")
     sys.exit(1)
-
-print(f"Archivo cargado prcesando {len(df)} correos...\n")
 
 todos_los_problemas = []
 todas_las_calificaciones = []
@@ -56,19 +81,12 @@ for index, row in df.iterrows():
     contenido = row['Contenido']
     
     resultado = analizar_correo_local(asunto, contenido)
-    
+    enviar=obtener_datos
     if resultado['problemas'] != 'Ninguno' and resultado['problemas'] != 'Error':
         todos_los_problemas.append(resultado['problemas'])
     
     if isinstance(resultado['calificacion'], (int, float)) and resultado['calificacion'] > 0:
         todas_las_calificaciones.append(resultado['calificacion'])
-
-    print(f"--- Correo {index + 1} ---")
-    print(f"Asunto: {asunto}")
-    print(f"Sentimiento: {resultado['sentimiento']}")
-    print(f"Problema: {resultado['problemas']}")
-    print(f"Calificación: {resultado['calificacion']}/10")
-    print("-" * 30)
 
 print("\n Generando Resumen General...\n")
 
@@ -95,13 +113,9 @@ try:
     resumen = ollama.chat(model='llama3.1', messages=[
         {'role': 'user', 'content': prompt_final}
     ])
-    
-    print("="*40)
-    print("REPORTE FINAL")
-    print("="*40)
-    print(resumen['message']['content'])
-
 except Exception as e:
-    print(f"Error generando resumen: {e}")
+    resumen = {"message": {"content": "Error al generar el resumen."}}
+    
 
-print("\nFin del programa")
+app.run(debug=True, port=5000)
+
