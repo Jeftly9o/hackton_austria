@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = "http://10.171.152.32:5000/";
 
 export const api = {
   getOverallSentiment: async () => {

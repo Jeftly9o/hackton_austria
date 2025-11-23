@@ -1,15 +1,10 @@
 import pandas as pd
 import ollama
-import os
 from pathlib import Path
 import sys
 import json
 from flask import Flask, jsonify
 from flask_cors import CORS
-
-# -------------------------
-# CARGAR CSV
-# -------------------------
 
 current_dir = Path(__file__).resolve().parent
 csv_path = current_dir.parent / 'database' / 'base_datos.csv'
@@ -51,9 +46,6 @@ def analizar_correo_local(asunto, contenido):
         return {"sentimiento": "Error", "problemas": str(e), "calificacion": 0}
 
 
-# -------------------------
-# PROCESAR CSV UNA VEZ
-# -------------------------
 
 df = pd.read_csv(csv_path).head(2)
 
@@ -112,18 +104,15 @@ except:
     resumen_texto = "Error al generar resumen."
 
 
-# -------------------------
-# FLASK API
-# -------------------------
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/analisis-individual', methods=['GET'])
+@app.route('http://10.171.152.32:5000/analisis-individual', methods=['GET'])
 def obtener_datos():
     return jsonify(resultados_individuales)
 
-@app.route('/api/resumen-global', methods=['GET'])
+@app.route('http://10.171.152.32:5000/resumen-global', methods=['GET'])
 def obtener_datos_finales():
     respuesta_final = {
         "problemas_detectados": todos_los_problemas,
@@ -132,4 +121,5 @@ def obtener_datos_finales():
     }
     return jsonify(respuesta_final)
 
-app.run(debug=True, port=5000)
+app.run(debug=True, port=5000, host='0.0.0.0')
+
