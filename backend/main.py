@@ -17,9 +17,7 @@ if not csv_path.exists():
 app = Flask(__name__)
 # Habilita CORS para permitir peticiones desde React
 CORS(app)
-@app.route('/api/llama', methods=['GET'])
-
-
+@app.route('/api/analisis-individual', methods=['GET'])
 def obtener_datos():
     respuesta = {
         "asunto":{asunto},
@@ -30,13 +28,14 @@ def obtener_datos():
     }
 
     return jsonify(respuesta)
+@app.route('/api/resumen-global', methods=['GET'])
 def obtener_datos_finales():
     respuesta_final = {
         "problemas_detectados": todos_los_problemas,
         "calificacion_promedio": promedio,
         "resumen_ejecutivo": resumen['message']['content']
     }
-    return {"mensaje": "API funcionando correctamente"}
+    return jsonify(respuesta_final)
 
 
 def analizar_correo_local(asunto, contenido):
@@ -115,7 +114,7 @@ try:
     ])
 except Exception as e:
     resumen = {"message": {"content": "Error al generar el resumen."}}
-    
+    enviar_final=obtener_datos_finales
 
 app.run(debug=True, port=5000)
 
