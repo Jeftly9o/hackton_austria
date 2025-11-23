@@ -27,5 +27,11 @@
     "asunto": "Retraso en linea 1",
     "contenido": "El metro se esta deteniendo constantemente.",
     "fecha": "2025-11-23T11:42:32.221Z"
+  },
+  {
+    "nombre": "John",
+    "asunto": "Retraso Linea 1",
+    "contenido": "El tren se detiene constantemente\n",
+    "fecha": "2025-11-23T12:19:50.899Z"
   }
 ]
