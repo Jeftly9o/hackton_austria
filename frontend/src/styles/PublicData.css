@@ -1,6 +1,6 @@
 .public-data-dashboard {
   padding: 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0A0000 0%, #000000 100%);
   min-height: 100vh;
   font-family: 'Inter', 'Segoe UI', sans-serif;
 }
@@ -50,7 +50,7 @@
   padding: 16px;
   background: #f7fafc;
   border-radius: 12px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #0A0000;
   transition: all 0.3s ease;
 }
 
@@ -76,7 +76,7 @@
 
 .source-type.público { 
   background: linear-gradient(135deg, #e3f2fd, #bbdefb); 
-  color: #1565c0; 
+  color: #c01515; 
 }
 .source-type.interno { 
   background: linear-gradient(135deg, #f3e5f5, #e1bee7); 
