@@ -13,6 +13,9 @@ if not csv_path.exists():
     print("Error: No se encuentra el archivo CSV")
     sys.exit(1)
 
+# Cargar el DataFrame una vez al inicio
+df = pd.read_csv(csv_path)
+
 def analizar_correo_local(asunto, contenido):
     prompt = f"""
     Analiza el siguiente correo.
@@ -21,7 +24,7 @@ def analizar_correo_local(asunto, contenido):
     
     Responde ÚNICAMENTE con un JSON válido con este formato exacto:
     {{
-        "Calidad: "buena/regular/mala",
+        "Calidad": "buena/regular/mala",
         "Categorías": "retrasos, limpieza, seguridad, horarios, atención o 'otros'",
         "sentimiento": "Positivo/Negativo/Neutral",
         "problemas": "Resumen muy breve del problema o 'Ninguno'",
@@ -37,7 +40,7 @@ def analizar_correo_local(asunto, contenido):
         inicio = texto.find('{')
         fin = texto.rfind('}') + 1
 
-        if inicio != -1 and fin != -1:
+        if inicio != -1 and fin != 0:
             return json.loads(texto[inicio:fin])
         else:
             return {"sentimiento": "Neutral", "problemas": "Error Formato", "calificacion": 5}
@@ -45,81 +48,88 @@ def analizar_correo_local(asunto, contenido):
     except Exception as e:
         return {"sentimiento": "Error", "problemas": str(e), "calificacion": 0}
 
-
-
-df = pd.read_csv(csv_path).head(2)
-
-resultados_individuales = []
-todos_los_problemas = []
-todas_las_calificaciones = []
-
-for _, row in df.iterrows():
-    asunto = row['Asunto']
-    contenido = row['Contenido']
-
-    resultado = analizar_correo_local(asunto, contenido)
-
-resultados_individuales.append({
-    "asunto": asunto,
-    "contenido": contenido,
-    "sentimiento": resultado["sentimiento"],
-    "problemas": resultado["problemas"],
-    "calificacion": resultado["calificacion"]
-})
-    # Acumular para resumen general
-if resultado["problemas"] not in ["Ninguno", "Error"]:
-        todos_los_problemas.append(resultado["problemas"])
-
-if isinstance(resultado["calificacion"], (int, float)) and resultado["calificacion"] > 0:
-        todas_las_calificaciones.append(resultado["calificacion"])
-
-
-# Calcular promedio
-promedio = sum(todas_las_calificaciones) / len(todas_las_calificaciones) if todas_las_calificaciones else 0
-
-
-# -------------------------
-# CREAR RESUMEN GLOBAL
-# -------------------------
-
-prompt_final = f"""
-Genera un resumen ejecutivo basado en estos problemas:
-
-{todos_los_problemas}
-
-Promedio de calificaciones: {promedio:.2f}/10
-
-Dame:
-- Los 3 problemas principales
-- Una conclusión general
-"""
-
-try:
-    resumen = ollama.chat(model='llama3.1', messages=[
-        {'role': 'user', 'content': prompt_final}
-    ])
-    resumen_texto = resumen["message"]["content"]
-
-except:
-    resumen_texto = "Error al generar resumen."
-
-
-
 app = Flask(__name__)
 CORS(app)
 
-@app.route('http://10.171.152.32:5000/analisis-individual', methods=['GET'])
+@app.route('/api/analisis-individual', methods=['GET'])
 def obtener_datos():
+    # Analizar solo las primeras 2 filas para cada request
+    df_analizar = df.head(2)
+    
+    resultados_individuales = []
+    for _, row in df_analizar.iterrows():
+        asunto = row['Asunto']
+        contenido = row['Contenido']
+
+        resultado = analizar_correo_local(asunto, contenido)
+
+        resultados_individuales.append({
+            "asunto": asunto,
+            "contenido": contenido,
+            "sentimiento": resultado["sentimiento"],
+            "problemas": resultado["problemas"],
+            "calificacion": resultado["calificacion"]
+        })
+    
     return jsonify(resultados_individuales)
 
-@app.route('http://10.171.152.32:5000/resumen-global', methods=['GET'])
+@app.route('/api/resumen-global', methods=['GET'])
 def obtener_datos_finales():
+    # Analizar todas las filas para el resumen global
+    resultados_individuales = []
+    todos_los_problemas = []
+    todas_las_calificaciones = []
+
+    for _, row in df.iterrows():
+        asunto = row['Asunto']
+        contenido = row['Contenido']
+
+        resultado = analizar_correo_local(asunto, contenido)
+
+        resultados_individuales.append({
+            "asunto": asunto,
+            "contenido": contenido,
+            "sentimiento": resultado["sentimiento"],
+            "problemas": resultado["problemas"],
+            "calificacion": resultado["calificacion"]
+        })
+
+        if resultado["problemas"] not in ["Ninguno", "Error"]:
+            todos_los_problemas.append(resultado["problemas"])
+
+        if isinstance(resultado["calificacion"], (int, float)) and resultado["calificacion"] > 0:
+            todas_las_calificaciones.append(resultado["calificacion"])
+
+    promedio = sum(todas_las_calificaciones) / len(todas_las_calificaciones) if todas_las_calificaciones else 0
+
+    prompt_final = f"""
+    Genera un resumen ejecutivo basado en estos problemas:
+
+    {todos_los_problemas}
+
+    Promedio de calificaciones: {promedio:.2f}/10
+
+    Dame:
+    - Los 3 problemas principales
+    - Una conclusión general
+    """
+
+    try:
+        response = ollama.chat(model='llama3.1', messages=[
+            {'role': 'user', 'content': prompt_final}
+        ])
+        
+        resumen_texto = response["message"]["content"]
+    except:
+        resumen_texto = "Error al generar resumen."
+
     respuesta_final = {
         "problemas_detectados": todos_los_problemas,
         "calificacion_promedio": promedio,
         "resumen_ejecutivo": resumen_texto
     }
+    
     return jsonify(respuesta_final)
 
-app.run(debug=True, port=5000, host='0.0.0.0')
-
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)

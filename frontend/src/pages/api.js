@@ -1,4 +1,4 @@
-const API_URL = "http://10.171.152.32:5000/";
+const API_URL = "http://localhost:5000/api";
 
 export const api = {
   getOverallSentiment: async () => {
@@ -54,7 +54,7 @@ export const api = {
       data: {
         words: data.problemas_detectados.map((p) => ({
           text: p,
-          value: Math.floor(Math.random() * 80) + 20,
+          value: 2,
         })),
       },
     };
