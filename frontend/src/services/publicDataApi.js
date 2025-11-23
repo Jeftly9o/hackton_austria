@@ -28,10 +28,10 @@ export const publicDataMock = {
       { factor1: "Cobertura", factor2: "Recomendación", correlation: 0.82 }
     ],
     insights: [
-      "📉 Los retrasos generan 3x más quejas que otros factores",
-      "💰 Operadores con precios altos tienen 40% menos satisfacción",
-      "🌐 La cobertura de red impacta directamente en las recomendaciones",
-      "⏱️ Cada 10 min de espera reduce la satisfacción en 2 puntos"
+      "Los retrasos generan 3x más quejas que otros factores",
+      "Operadores con precios altos tienen 40% menos satisfacción",
+      "La cobertura de red impacta directamente en las recomendaciones",
+      "Cada 10 min de espera reduce la satisfacción en 2 puntos"
     ],
     comparison: {
       metrics: {
