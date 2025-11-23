@@ -18,10 +18,6 @@ if not csv_path.exists():
     print("Error: No se encuentra el archivo CSV")
     sys.exit(1)
 
-# -------------------------
-# FUNCIÓN DE ANÁLISIS
-# -------------------------
-
 def analizar_correo_local(asunto, contenido):
     prompt = f"""
     Analiza el siguiente correo.
@@ -71,19 +67,18 @@ for _, row in df.iterrows():
 
     resultado = analizar_correo_local(asunto, contenido)
 
-    resultados_individuales.append({
-        "asunto": asunto,
-        "contenido": contenido,
-        "sentimiento": resultado["sentimiento"],
-        "problemas": resultado["problemas"],
-        "calificacion": resultado["calificacion"]
-    })
-
+resultados_individuales.append({
+    "asunto": asunto,
+    "contenido": contenido,
+    "sentimiento": resultado["sentimiento"],
+    "problemas": resultado["problemas"],
+    "calificacion": resultado["calificacion"]
+})
     # Acumular para resumen general
-    if resultado["problemas"] not in ["Ninguno", "Error"]:
+if resultado["problemas"] not in ["Ninguno", "Error"]:
         todos_los_problemas.append(resultado["problemas"])
 
-    if isinstance(resultado["calificacion"], (int, float)) and resultado["calificacion"] > 0:
+if isinstance(resultado["calificacion"], (int, float)) and resultado["calificacion"] > 0:
         todas_las_calificaciones.append(resultado["calificacion"])
 
 
