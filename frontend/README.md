@@ -1,5 +1,12 @@
 # React + Vite
 
+para evitar problemas de compatibilidad ejecutar estos comandos:
+cd hackton_austria/
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install pandas ollama flask flask-cors
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
