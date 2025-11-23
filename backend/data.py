@@ -31,7 +31,7 @@ def analizar_correo_local(asunto, contenido):
     Responde ÚNICAMENTE con un JSON válido con este formato exacto:
     {{
         "sentimiento": "Positivo/Negativo/Neutral",
-        "problemas": "Resumen breve o 'Ninguno'",
+        "problemas": "identifica el problema y devuelve solo las palabras clave como "Saturación" refiriendose a Aglomeraciones,"Retrasos","Averías" si hay averías Mecánicas/Eléctricas,"Obsolescencia" si hay Infraestructura antigua,"Inseguridad" si hay Robos,Acoso o Vandalismo","otros" en caso de que no encaje en las anteriores",
         "calificacion": Entero del 1 al 10
     }}
     """
@@ -57,7 +57,7 @@ def analizar_correo_local(asunto, contenido):
 # PROCESAR CSV UNA VEZ
 # -------------------------
 
-df = pd.read_csv(csv_path).head(5)
+df = pd.read_csv(csv_path).head(2)
 
 resultados_individuales = []
 todos_los_problemas = []

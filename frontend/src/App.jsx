@@ -1,11 +1,11 @@
-import React from 'react';
-import Dashboard from './components/layout/Dashboard';
-import './App.css';
+import React from "react";
+import EmailDashboard from "./components/layout/EmailDashboard";
+import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <Dashboard />
+      <EmailDashboard />
     </div>
   );
 }
