@@ -21,8 +21,6 @@ export const api = {
   },
 
   getSentimentByOperator: async () => {
-    // si tu CSV tiene columna Operador, aquí lo agrupas...
-    // por ahora devolvemos estructura vacía
     return { data: { operators: [] } };
   },
 
