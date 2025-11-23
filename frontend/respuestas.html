@@ -20,7 +20,7 @@
         nav a:hover { background: #eee; color: var(--accent); }
         nav a.active { color: var(--accent); background: #fff0f2; }
 
-        /* --- LAYOUT GRID --- */
+        /* --- LAYOUT --- */
         .main-container {
             padding: 30px 4vw;
             max-width: 1400px;
@@ -31,41 +31,83 @@
         .header-section h1 { margin: 0; font-size: 28px; font-weight: 800; color: #1a1a1a; }
         .header-section p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
 
-        /* GRID AUTOMÁTICO */
+        /* --- GRID DE GRÁFICAS --- */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); /* 2 columnas si cabe */
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 25px;
+            margin-bottom: 40px;
         }
 
-        /* TARJETA DE GRÁFICA */
         .chart-card {
             background: var(--card);
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             border: 1px solid #e5e7eb;
-            height: 400px; /* Altura estándar */
+            height: 400px;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* CLASE PARA GRÁFICA GRANDE (Ocupa todo el ancho) */
-        .chart-card.full-width {
-            grid-column: 1 / -1;
-            height: 500px;
-        }
-
+        .chart-card.full-width { grid-column: 1 / -1; height: 450px; }
+        
         .chart-header { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .chart-header h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--dark); }
-        
-        .chart-wrapper {
-            flex: 1;
-            position: relative;
-            width: 100%;
-            height: 100%;
+        .chart-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
+
+        /* --- NUEVA SECCIÓN: TABLA DE REPORTES --- */
+        .reports-section {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
         }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafafa;
+        }
+        .table-header h2 { margin: 0; font-size: 18px; font-weight: 700; }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: var(--muted);
+            font-weight: 600;
+            padding: 12px 20px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            vertical-align: top;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f9fafb; }
+
+        .col-fecha { width: 150px; color: var(--muted); font-size: 12px; font-weight: 500;}
+        .col-asunto { font-weight: 600; color: var(--dark); width: 25%; }
+        .col-contenido { line-height: 1.5; }
 
         .btn{background:var(--accent);color:#fff;padding:10px 18px;border-radius:6px;border:none;cursor:pointer;font-weight:600;text-decoration: none; font-size: 13px; transition: background 0.2s;}
         
@@ -84,9 +126,10 @@
         </div>
         <nav>
             <a href="index.html">Inicio</a>
+            <a href="index2.html">Gráficas</a>
             <a href="index3.html">Formulario</a>
-            <a href="index2.html" class="active">Gráficas</a>
-            <a href="help.html" class="active">Help</a>
+            <a href="help.html">Help</a>
+            <a href="respuestas.html" class="active">Gráficas de quejas del formulario</a>
         </nav>
     </header>
 
@@ -94,7 +137,7 @@
         <div class="header-section">
             <div>
                 <h1>Dashboard Visual</h1>
-                <p>Generación dinámica de gráficas desde archivos JSON.</p>
+                <p>Generación dinámica de gráficas y reportes recibidos.</p>
             </div>
             <a href="index3.html" class="btn">+ Nuevo Reporte</a>
         </div>
@@ -102,92 +145,91 @@
         <div id="charts-container" class="charts-grid">
             <p style="grid-column:1/-1; text-align:center; color:#999;">Cargando visualizaciones...</p>
         </div>
+
+        <div class="reports-section">
+            <div class="table-header">
+                <h2>📋 Buzón de Reportes Recientes</h2>
+            </div>
+            <div class="table-responsive">
+                <table id="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nombre</th>
+                            <th>Asunto</th>
+                            <th>Contenido del Reporte</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reports-body">
+                        <tr><td colspan="4" style="text-align:center; padding:20px;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        // -------------------------------------------------------
-        // 1. CONFIGURACIÓN MAESTRA (¡Aquí agregas tus archivos!)
-        // -------------------------------------------------------
+        // ============================================================
+        // PARTE 1: GRÁFICAS
+        // ============================================================
         const graficas = [
             { 
-                url: '/respuestas.json',  // Usamos la ruta API para respuestas.json
+                url: '/respuestas.json', // Usamos /api/datos para asegurar datos frescos
                 titulo: 'Historial de Reportes (Tiempo Real)', 
                 tipo: 'line', 
-                grande: true,       // <--- OCUPA TODO EL ANCHO
-                esTiempo: true      // <--- Activa la lógica de fechas
+                grande: true, 
+                esTiempo: true 
             },
             { 
                 url: 'tablas/top30.json', 
                 titulo: 'Top 30 Palabras Clave', 
                 tipo: 'bar',
-                ejeX: 'word',       // Nombre de la columna texto en el JSON
-                ejeY: 'count'       // Nombre de la columna número en el JSON
+                ejeX: 'word', ejeY: 'count' 
             },
             { 
                 url: 'tablas/content_top30.json', 
                 titulo: 'Contenido Recurrente', 
                 tipo: 'bar',
-                color: '#3b82f6',   // Color azul para variar
-                ejeX: 'word',
-                ejeY: 'count'
+                color: '#3b82f6',
+                ejeX: 'word', ejeY: 'count'
             },
             { 
                 url: 'tablas/top10_triples.json', 
                 titulo: 'Top 10 Triples', 
-                tipo: 'doughnut',   // Gráfica de dona
-                ejeX: 'triple',
-                ejeY: 'count'
+                tipo: 'doughnut',
+                ejeX: 'triple', ejeY: 'count'
             }
         ];
 
-        // -------------------------------------------------------
-        // 2. LÓGICA DE GENERACIÓN
-        // -------------------------------------------------------
         async function cargarDashboard() {
             const container = document.getElementById('charts-container');
-            container.innerHTML = ''; // Limpiar
+            container.innerHTML = ''; 
 
             for (let i = 0; i < graficas.length; i++) {
                 const config = graficas[i];
-                
-                // Crear estructura HTML para la tarjeta
                 const cardId = `chartCanvas-${i}`;
                 const claseExtra = config.grande ? 'full-width' : '';
                 
-                const cardHTML = `
+                container.innerHTML += `
                     <div class="chart-card ${claseExtra}">
-                        <div class="chart-header">
-                            <h3>${config.titulo}</h3>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="${cardId}"></canvas>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += cardHTML; // Agregar al DOM
+                        <div class="chart-header"><h3>${config.titulo}</h3></div>
+                        <div class="chart-wrapper"><canvas id="${cardId}"></canvas></div>
+                    </div>`;
             }
 
-            // Una vez creados los DIVs, dibujamos las gráficas una por una
             for (let i = 0; i < graficas.length; i++) {
                 const config = graficas[i];
                 const ctx = document.getElementById(`chartCanvas-${i}`).getContext('2d');
                 
                 try {
                     const response = await fetch(config.url);
-                    if(!response.ok) throw new Error("Error fetch");
-                    
+                    if(!response.ok) continue;
                     let rawData = await response.json();
-                    
-                    // Validar si está vacío
-                    if(!Array.isArray(rawData) || rawData.length === 0) {
-                        console.warn(`Archivo vacío: ${config.titulo}`);
-                        continue;
-                    }
+                    if(!Array.isArray(rawData) || rawData.length === 0) continue;
 
-                    let etiquetas = [];
-                    let valores = [];
+                    let etiquetas = [], valores = [];
 
-                    // --- LÓGICA A: Si es LÍNEA DE TIEMPO (Respuestas) ---
                     if (config.esTiempo) {
                         const conteo = {};
                         rawData.forEach(item => {
@@ -198,21 +240,14 @@
                         });
                         etiquetas = Object.keys(conteo).sort();
                         valores = etiquetas.map(d => conteo[d]);
-                    } 
-                    // --- LÓGICA B: Si es LISTA ESTÁNDAR (Top 30, etc) ---
-                    else {
-                        // Intentamos adivinar columnas si no se definieron
-                        const llaveTexto = config.ejeX || Object.keys(rawData[0])[0]; // Primera columna
-                        const llaveNum = config.ejeY || Object.keys(rawData[0])[1];   // Segunda columna
-                        
-                        // Limitamos a 15 datos para que no se sature la gráfica
+                    } else {
+                        const llaveTexto = config.ejeX || Object.keys(rawData[0])[0];
+                        const llaveNum = config.ejeY || Object.keys(rawData[0])[1];
                         const datosLimitados = rawData.slice(0, 15); 
-
                         etiquetas = datosLimitados.map(d => d[llaveTexto]);
                         valores = datosLimitados.map(d => d[llaveNum]);
                     }
 
-                    // DIBUJAR CHART.JS
                     new Chart(ctx, {
                         type: config.tipo || 'bar',
                         data: {
@@ -221,33 +256,80 @@
                                 label: 'Frecuencia',
                                 data: valores,
                                 backgroundColor: config.tipo === 'doughnut' 
-                                    ? ['#d4001f', '#0b1220', '#6b7280', '#e5e7eb', '#ef4444'] // Colores variados para dona
-                                    : (config.color || '#d4001f'), // Color único para barras/linea
+                                    ? ['#d4001f', '#0b1220', '#6b7280', '#e5e7eb', '#ef4444']
+                                    : (config.color || '#d4001f'),
                                 borderColor: (config.color || '#d4001f'),
                                 borderWidth: 1,
-                                tension: 0.4, // Curvas suaves si es línea
-                                fill: config.tipo === 'line' // Relleno si es línea
+                                tension: 0.4, fill: config.tipo === 'line'
                             }]
                         },
                         options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: config.tipo === 'doughnut' } // Solo mostrar leyenda en dona
-                            },
-                            scales: config.tipo === 'doughnut' ? {} : { // Ocultar ejes en dona
-                                y: { beginAtZero: true }
-                            }
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { display: config.tipo === 'doughnut' } },
+                            scales: config.tipo === 'doughnut' ? {} : { y: { beginAtZero: true } }
                         }
                     });
+                } catch (e) { console.error(e); }
+            }
+        }
 
-                } catch (e) {
-                    console.error(`Error cargando gráfica ${i}:`, e);
+        // ============================================================
+        // PARTE 2: TABLA DE REPORTES (CORREGIDO)
+        // ============================================================
+        async function cargarTablaReportes() {
+            const tbody = document.getElementById('reports-body');
+            
+            try {
+                // Usamos /api/datos en lugar de /respuestas.json para leer
+                // directamente del servidor y evitar caché
+                const response = await fetch('/respuestas.json'); 
+                
+                if (!response.ok) throw new Error('Error cargando datos');
+                
+                const data = await response.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#888;">No hay reportes registrados aún.</td></tr>';
+                    return;
                 }
+
+                data.reverse(); // Los más recientes primero
+
+                let htmlFilas = '';
+
+                data.forEach(item => {
+                    let fechaBonita = 'Sin fecha';
+                    if (item.fecha) {
+                        const d = new Date(item.fecha);
+                        fechaBonita = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    }
+
+                    const asunto = (item.asunto || 'Sin asunto').replace(/</g, "&lt;");
+                    const contenido = (item.contenido || 'Sin contenido').replace(/</g, "&lt;");
+                    const nombre = (item.nombre || 'Anónimo').replace(/</g, "&lt;");
+
+                    // ---> AQUÍ ESTABA EL ERROR ANTES: Usábamos ${fecha} y debe ser ${fechaBonita}
+                    htmlFilas += `
+                        <tr>
+                            <td class="col-fecha">${fechaBonita}</td>
+                            <td style="font-weight:600;">${nombre}</td>
+                            <td class="col-asunto">${asunto}</td>
+                            <td class="col-contenido">${contenido}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = htmlFilas;
+
+            } catch (error) {
+                console.error("Error tabla:", error);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:red;">Error al cargar la lista de reportes.</td></tr>';
             }
         }
 
         cargarDashboard();
+        cargarTablaReportes();
+
     </script>
 </body>
 </html>
