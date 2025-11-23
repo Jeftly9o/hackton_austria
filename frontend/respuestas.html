@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Gráficas — Transit Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root{--accent:#d4001f;--accent-dark:#a30018;--dark:#0b1220;--muted:#6b7280;--bg:#f0f2f5;--card:#ffffff}
+        html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+        body{background:var(--bg);color:var(--dark)}
+
+        /* --- HEADER & NAV --- */
+        .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1);position:sticky;top:0;z-index:100}
+        .brand{display:flex;align-items:center;gap:10px}
+        .logo{width:36px;height:36px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+        
+        nav { display: flex; gap: 5px; }
+        nav a{color:var(--muted);text-decoration:none;font-weight:500; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: all 0.2s;}
+        nav a:hover { background: #eee; color: var(--accent); }
+        nav a.active { color: var(--accent); background: #fff0f2; }
+
+        /* --- LAYOUT GRID --- */
+        .main-container {
+            padding: 30px 4vw;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-section { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: end; }
+        .header-section h1 { margin: 0; font-size: 28px; font-weight: 800; color: #1a1a1a; }
+        .header-section p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+
+        /* GRID AUTOMÁTICO */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); /* 2 columnas si cabe */
+            gap: 25px;
+        }
+
+        /* TARJETA DE GRÁFICA */
+        .chart-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            height: 400px; /* Altura estándar */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* CLASE PARA GRÁFICA GRANDE (Ocupa todo el ancho) */
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+            height: 500px;
+        }
+
+        .chart-header { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .chart-header h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--dark); }
+        
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn{background:var(--accent);color:#fff;padding:10px 18px;border-radius:6px;border:none;cursor:pointer;font-weight:600;text-decoration: none; font-size: 13px; transition: background 0.2s;}
+        
+        @media(max-width: 768px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="logo">T</div>
+            <div style="font-weight:800; font-size:18px;">Transit</div>
+        </div>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="index3.html">Reportar</a>
+            <a href="index2.html" class="active">Gráficas</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="header-section">
+            <div>
+                <h1>Dashboard Visual</h1>
+                <p>Generación dinámica de gráficas desde archivos JSON.</p>
+            </div>
+            <a href="index3.html" class="btn">+ Nuevo Reporte</a>
+        </div>
+
+        <div id="charts-container" class="charts-grid">
+            <p style="grid-column:1/-1; text-align:center; color:#999;">Cargando visualizaciones...</p>
+        </div>
+    </main>
+
+    <script>
+        // -------------------------------------------------------
+        // 1. CONFIGURACIÓN MAESTRA (¡Aquí agregas tus archivos!)
+        // -------------------------------------------------------
+        const graficas = [
+            { 
+                url: '/frontend/respuestas.json',  // Usamos la ruta API para respuestas.json
+                titulo: 'Historial de Reportes (Tiempo Real)', 
+                tipo: 'line', 
+                grande: true,       // <--- OCUPA TODO EL ANCHO
+                esTiempo: true      // <--- Activa la lógica de fechas
+            },
+            { 
+                url: 'tablas/top30.json', 
+                titulo: 'Top 30 Palabras Clave', 
+                tipo: 'bar',
+                ejeX: 'word',       // Nombre de la columna texto en el JSON
+                ejeY: 'count'       // Nombre de la columna número en el JSON
+            },
+            { 
+                url: 'tablas/content_top30.json', 
+                titulo: 'Contenido Recurrente', 
+                tipo: 'bar',
+                color: '#3b82f6',   // Color azul para variar
+                ejeX: 'word',
+                ejeY: 'count'
+            },
+            { 
+                url: 'tablas/top10_triples.json', 
+                titulo: 'Top 10 Triples', 
+                tipo: 'doughnut',   // Gráfica de dona
+                ejeX: 'triple',
+                ejeY: 'count'
+            }
+        ];
+
+        // -------------------------------------------------------
+        // 2. LÓGICA DE GENERACIÓN
+        // -------------------------------------------------------
+        async function cargarDashboard() {
+            const container = document.getElementById('charts-container');
+            container.innerHTML = ''; // Limpiar
+
+            for (let i = 0; i < graficas.length; i++) {
+                const config = graficas[i];
+                
+                // Crear estructura HTML para la tarjeta
+                const cardId = `chartCanvas-${i}`;
+                const claseExtra = config.grande ? 'full-width' : '';
+                
+                const cardHTML = `
+                    <div class="chart-card ${claseExtra}">
+                        <div class="chart-header">
+                            <h3>${config.titulo}</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="${cardId}"></canvas>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML; // Agregar al DOM
+            }
+
+            // Una vez creados los DIVs, dibujamos las gráficas una por una
+            for (let i = 0; i < graficas.length; i++) {
+                const config = graficas[i];
+                const ctx = document.getElementById(`chartCanvas-${i}`).getContext('2d');
+                
+                try {
+                    const response = await fetch(config.url);
+                    if(!response.ok) throw new Error("Error fetch");
+                    
+                    let rawData = await response.json();
+                    
+                    // Validar si está vacío
+                    if(!Array.isArray(rawData) || rawData.length === 0) {
+                        console.warn(`Archivo vacío: ${config.titulo}`);
+                        continue;
+                    }
+
+                    let etiquetas = [];
+                    let valores = [];
+
+                    // --- LÓGICA A: Si es LÍNEA DE TIEMPO (Respuestas) ---
+                    if (config.esTiempo) {
+                        const conteo = {};
+                        rawData.forEach(item => {
+                            if(item.fecha) {
+                                const dia = item.fecha.split('T')[0];
+                                conteo[dia] = (conteo[dia] || 0) + 1;
+                            }
+                        });
+                        etiquetas = Object.keys(conteo).sort();
+                        valores = etiquetas.map(d => conteo[d]);
+                    } 
+                    // --- LÓGICA B: Si es LISTA ESTÁNDAR (Top 30, etc) ---
+                    else {
+                        // Intentamos adivinar columnas si no se definieron
+                        const llaveTexto = config.ejeX || Object.keys(rawData[0])[0]; // Primera columna
+                        const llaveNum = config.ejeY || Object.keys(rawData[0])[1];   // Segunda columna
+                        
+                        // Limitamos a 15 datos para que no se sature la gráfica
+                        const datosLimitados = rawData.slice(0, 15); 
+
+                        etiquetas = datosLimitados.map(d => d[llaveTexto]);
+                        valores = datosLimitados.map(d => d[llaveNum]);
+                    }
+
+                    // DIBUJAR CHART.JS
+                    new Chart(ctx, {
+                        type: config.tipo || 'bar',
+                        data: {
+                            labels: etiquetas,
+                            datasets: [{
+                                label: 'Frecuencia',
+                                data: valores,
+                                backgroundColor: config.tipo === 'doughnut' 
+                                    ? ['#d4001f', '#0b1220', '#6b7280', '#e5e7eb', '#ef4444'] // Colores variados para dona
+                                    : (config.color || '#d4001f'), // Color único para barras/linea
+                                borderColor: (config.color || '#d4001f'),
+                                borderWidth: 1,
+                                tension: 0.4, // Curvas suaves si es línea
+                                fill: config.tipo === 'line' // Relleno si es línea
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: config.tipo === 'doughnut' } // Solo mostrar leyenda en dona
+                            },
+                            scales: config.tipo === 'doughnut' ? {} : { // Ocultar ejes en dona
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+
+                } catch (e) {
+                    console.error(`Error cargando gráfica ${i}:`, e);
+                }
+            }
+        }
+
+        cargarDashboard();
+    </script>
+</body>
+</html>

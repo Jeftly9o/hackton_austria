@@ -21,5 +21,11 @@
     "asunto": "Sexo",
     "contenido": "Sexo",
     "fecha": "2025-11-23T11:12:34.983Z"
+  },
+  {
+    "nombre": "Caros",
+    "asunto": "Retraso en linea 1",
+    "contenido": "El metro se esta deteniendo constantemente.",
+    "fecha": "2025-11-23T11:42:32.221Z"
   }
 ]
