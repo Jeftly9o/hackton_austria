@@ -1,37 +1,63 @@
 import pandas as pd
-from textblob import TextBlob  
+import ollama
+import json
+
+def analizar_correo_local(asunto, contenido):
+    prompt = f"""
+    Analiza el siguiente correo.
+    Asunto: {asunto}
+    Contenido: {contenido}
+    
+    Responde ÚNICAMENTE con un JSON válido con este formato exacto (sin texto extra):
+    {{
+        "sentimiento": "Positivo/Negativo/Neutral",
+        "problemas": "Resumen del problema o 'Ninguno'",
+        "calificacion": Entero del 1 al 10
+    }}
+    """
+
+    try:
+        response = ollama.chat(model='llama3.1', messages=[
+            {
+                'role': 'user',
+                'content': prompt,
+            },
+        ])
+        
+        respuesta_texto = response['message']['content']
+        
+        start = respuesta_texto.find('{')
+        end = respuesta_texto.rfind('}') + 1
+        if start != -1 and end != -1:
+            json_str = respuesta_texto[start:end]
+            return json.loads(json_str)
+        else:
+            return {"sentimiento": "Error Formato", "problemas": "Error", "calificacion": 0}
+
+    except Exception as e:
+        print(f"Error con Ollama: {e}")
+        return {"sentimiento": "Error", "problemas": "Error", "calificacion": 0}
 
 df = pd.read_csv('tu_archivo.csv')
 
-columnas_requeridas = [
-    'Nombre_remitente',
-    'Email_remitente',
-    'Nombre_destinatario',
-    'Email_destinatario',
-    'Asunto',
-    'Contenido',
-    'Fecha',
-    'Message-ID'
-]
+print("Analizando con Ollama local (Llama 3.1)...")
 
-df.columns = [c.strip() for c in df.columns] 
+sentimientos = []
+problemas = []
+calificaciones = []
 
-reseñas = []
-for _, row in df.iterrows():
-    contenido = str(row['Contenido'])
+for index, row in df.iterrows():
+    print(f"Procesando correo {index + 1} de {len(df)}...") 
     
-    analysis = TextBlob(contenido)
-    polaridad = analysis.sentiment.polarity  # Rango: [-1, 1]
+    resultado = analizar_correo_local(row['Asunto'], row['Contenido'])
+    
+    sentimientos.append(resultado.get('sentimiento'))
+    problemas.append(resultado.get('problemas'))
+    calificaciones.append(resultado.get('calificacion'))
 
-    reseña_escala = (polaridad + 1) * 2.5  # Ejemplo: -1 -> 1, 0 -> 3, 1 -> 5
-    reseñas.append(reseña_escala)
+df['IA_Sentimiento'] = sentimientos
+df['IA_Problemas'] = problemas
+df['IA_Calificacion'] = calificaciones
 
-    # Opcional: Imprimir datos procesados
-    print(f"Remitente: {row['Nombre_remitente']} | Asunto: {row['Asunto']} | Reseña: {reseña_escala:.2f}")
-
-# Calcular reseña promedio
-if reseñas:
-    reseña_promedio = sum(reseñas) / len(reseñas)
-    print(f"\n--- Reseña Promedio de todos los datos: {reseña_promedio:.2f} ---")
-else:
-    print("No se encontraron datos para analizar.")
+df.to_csv('resultado_ollama.csv', index=False)
+print("¡Listo!")
